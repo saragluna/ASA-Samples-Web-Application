@@ -1,21 +1,17 @@
 package com.microsoft.azure.simpletodo.model;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import java.time.OffsetDateTime;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
-
-
-import javax.annotation.Generated;
+import java.time.OffsetDateTime;
+import java.util.Objects;
 
 /**
  * A task that needs to be completed
