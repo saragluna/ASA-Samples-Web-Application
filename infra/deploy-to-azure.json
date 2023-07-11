@@ -26,6 +26,7 @@
     },
     "relativePath": {
       "type": "string",
+      "defaultValue": "default",
       "metadata": {
         "description": "Relative Path of ASA Jar"
       }
