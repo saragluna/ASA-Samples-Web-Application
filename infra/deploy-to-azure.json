@@ -490,32 +490,6 @@
               "dependsOn": [
                 "[resourceId('Microsoft.AppPlatform/Spring', parameters('asaInstanceName'))]"
               ]
-            },
-            {
-              "type": "Microsoft.AppPlatform/Spring/apps/deployments",
-              "apiVersion": "2022-12-01",
-              "name": "[format('{0}/{1}/{2}', parameters('asaInstanceName'), parameters('appName'), 'default')]",
-              "properties": {
-                "deploymentSettings": {
-                  "resourceRequests": {
-                    "cpu": "1",
-                    "memory": "2Gi"
-                  },
-                  "environmentVariables": {
-                    "SPRING_DATASOURCE_URL": "[parameters('datasourceUrl')]",
-                    "SPRING_DATASOURCE_USERNAME": "[parameters('databaseUsername')]",
-                    "SPRING_DATASOURCE_PASSWORD": "[parameters('databasePassword')]"
-                  }
-                },
-                "source": {
-                  "type": "Jar",
-                  "runtimeVersion": "Java_17",
-                  "relativePath": "[parameters('relativePath')]"
-                }
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.AppPlatform/Spring/apps', parameters('asaInstanceName'), parameters('appName'))]"
-              ]
             }
           ],
           "outputs": {
