@@ -14,6 +14,10 @@
   <name>SimpleTodo Client</name>
   <description>Simple Todo application - Client</description>
 
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
