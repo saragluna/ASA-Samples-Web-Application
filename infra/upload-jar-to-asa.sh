@@ -61,4 +61,7 @@ echo "az storage file upload -s $share_name --source $path --account-name  $stor
 az storage file upload -s $share_name --source $path --account-name  $storage_account_name --file-endpoint "$storage_endpoint" --sas-token "$sas_token"  -p "$folder"
 
 relative_path=$(az rest -m post -u "https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.AppPlatform/Spring/$ASA_SERVICE_NAME/apps/simple-todo-web/getResourceUploadUrl?api-version=2023-05-01-preview" | jq -r '.relativePath')
-echo "{\"relativePath\": $relative_path}" > $AZ_SCRIPTS_OUTPUT_PATH"
+
+# Write outputs to deployment script output path
+result=$(jq -n -c --arg relativePath $relative_path '{relativePath: $relativePath}')
+echo $result > $AZ_SCRIPTS_OUTPUT_PATH
