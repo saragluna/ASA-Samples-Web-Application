@@ -201,7 +201,7 @@
     "name_roleAssignmentName": "[guid(format('{0}{1}Role assignment in group{0}', resourceGroup().id, variables('ref_identityId')))]",
     "ref_identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('const_identityName'))]",
     "name_deploymentScriptName": "asa-deployment-script",
-    "const_scriptLocation": "",
+    "const_scriptLocation": "https://raw.githubusercontent.com/saragluna/ASA-Samples-Web-Application/quickstart/infra/upload-jar-to-asa.sh",
     "tags": {
       "azd-env-name": "[parameters('environmentName')]",
       "spring-cloud-azure": "true"
