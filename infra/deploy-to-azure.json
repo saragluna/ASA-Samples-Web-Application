@@ -544,7 +544,7 @@
                   },
                   {
                     "name": "RESOURCE_GROUP",
-                    "value": "[resourceGroup().id]"
+                    "value": "[resourceGroup().name]"
                   },
                   {
                     "name": "ASA_SERVICE_NAME",
