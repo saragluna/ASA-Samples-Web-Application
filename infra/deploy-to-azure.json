@@ -515,7 +515,8 @@
               "properties": {
                 "roleDefinitionId": "[variables('const_ownerRole')]",
                 "principalId": "[reference(variables('ref_identityId')).principalId]",
-                "principalType": "ServicePrincipal"
+                "principalType": "ServicePrincipal",
+                "scope": "[resourceGroup().id]"
               }
             },
             {
