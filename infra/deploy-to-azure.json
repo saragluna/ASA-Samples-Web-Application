@@ -471,7 +471,7 @@
             "ref_identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('const_identityName'))]",
             "name_resourceGroup": "[resourceGroup().name]",
             "name_deploymentScriptName": "asa-deployment-script",
-            "name_roleAssignmentName": "[guid(format('{0}{1}Role assignment in group{0}', variables('name_resourceGroup'), variables('ref_identityId')))]",        
+            "name_roleAssignmentName": "[guid(format('{0}{1}Role assignment in group{0}', variables('name_resourceGroup'), variables('ref_identityId')))]"     
           },
           "resources": [
             {
