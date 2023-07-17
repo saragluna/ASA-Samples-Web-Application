@@ -42,6 +42,10 @@
       "metadata": {
         "description": "Application user password"
       }
+    },
+    "guidValue": {
+      "defaultValue": "[newGuid()]",
+      "type": "securestring"
     }
   },
   "variables": {
@@ -191,6 +195,13 @@
     "datasourceJdbcUrl": "[format('jdbc:postgresql://{0}.postgres.database.azure.com:5432/{1}', variables('psqlServerName'), variables('databaseName'))]",
     "psqlAdminName": "psqladmin",
     "psqlUserName": "psqluser",
+    "const_identityName": "[concat('uami', variables('const_suffix'))]",
+    "const_suffix": "[take(replace(parameters('guidValue'), '-', ''), 6)]",
+    "const_ownerRole": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+    "name_roleAssignmentName": "[guid(format('{0}{1}Role assignment in group{0}', resourceGroup().id, variables('ref_identityId')))]",
+    "ref_identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('const_identityName'))]",
+    "name_deploymentScriptName": "asa-deployment-script",
+    "const_scriptLocation": "",
     "tags": {
       "azd-env-name": "[parameters('environmentName')]",
       "spring-cloud-azure": "true"
@@ -489,6 +500,88 @@
               },
               "dependsOn": [
                 "[resourceId('Microsoft.AppPlatform/Spring', parameters('asaInstanceName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+              "name": "[variables('const_identityName')]",
+              "apiVersion": "${azure.apiVersion.userAssignedIdentities}",
+              "location": "[parameters('location')]"
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "${azure.apiVersion.roleAssignment}",
+              "name": "[variables('name_roleAssignmentName')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('const_identityName'))]",
+                "[resourceId('Microsoft.AppPlatform/Spring', parameters('asaInstanceName'))]"
+              ],
+              "properties": {
+                "roleDefinitionId": "[variables('const_ownerRole')]",
+                "principalId": "[reference(variables('ref_identityId')).principalId]",
+                "principalType": "ServicePrincipal"
+              }
+            },
+            {
+              "type": "Microsoft.Resources/deploymentScripts",
+              "apiVersion": "2020-10-01",
+              "name": "[variables('name_deploymentScriptName')]",
+              "location": "[parameters('location')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Authorization/roleAssignments', variables('name_roleAssignmentName'))]"
+              ],
+              "kind": "AzureCLI",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[format('{0}', resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('const_identityName')))]": {}
+                }
+              },
+              "properties": {
+                "AzCliVersion": "2.41.0",
+                "primaryScriptUri": "[uri(variables('const_scriptLocation'))]",
+                "environmentVariables": [
+                  {
+                    "name": "SUBSCRIPTION_ID",
+                    "value": "[subscription().subscriptionId]"
+                  },
+                  {
+                    "name": "RESOURCE_GROUP",
+                    "value": "[resourceGroup().id]"
+                  },
+                  {
+                    "name": "ASA_SERVICE_NAME",
+                    "value": "[parameters('asaInstanceName')]"
+                  }
+                ],
+                "cleanupPreference": "OnSuccess",
+                "retentionInterval": "P1D"
+              }
+            },
+            {
+              "type": "Microsoft.AppPlatform/Spring/apps/deployments",
+              "apiVersion": "2022-12-01",
+              "name": "[format('{0}/{1}/{2}', parameters('asaInstanceName'), parameters('appName'), 'default')]",
+              "properties": {
+                "deploymentSettings": {
+                  "resourceRequests": {
+                    "cpu": "1",
+                    "memory": "2Gi"
+                  },
+                  "environmentVariables": {
+                    "SPRING_DATASOURCE_URL": "[parameters('datasourceUrl')]",
+                    "SPRING_DATASOURCE_USERNAME": "[parameters('databaseUsername')]",
+                    "SPRING_DATASOURCE_PASSWORD": "[parameters('databasePassword')]"
+                  }
+                },
+                "source": {
+                  "type": "Jar",
+                  "runtimeVersion": "Java_17",
+                  "relativePath": "[reference(variables('name_deploymentScriptName')).outputs.relativePath]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.AppPlatform/Spring/apps', parameters('asaInstanceName'), parameters('appName'))]"
               ]
             }
           ],
