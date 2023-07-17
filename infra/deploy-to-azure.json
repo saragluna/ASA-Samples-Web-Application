@@ -24,13 +24,6 @@
       },
       "minLength": 1
     },
-    "relativePath": {
-      "type": "string",
-      "defaultValue": "default",
-      "metadata": {
-        "description": "Relative Path of ASA Jar"
-      }
-    },
     "psqlAdminPassword": {
       "type": "securestring",
       "metadata": {
@@ -195,14 +188,6 @@
     "datasourceJdbcUrl": "[format('jdbc:postgresql://{0}.postgres.database.azure.com:5432/{1}', variables('psqlServerName'), variables('databaseName'))]",
     "psqlAdminName": "psqladmin",
     "psqlUserName": "psqluser",
-    "const_identityName": "[concat('uami', variables('const_suffix'))]",
-    "const_suffix": "[take(replace(parameters('guidValue'), '-', ''), 6)]",
-    "const_ownerRole": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
-    "const_scriptLocation": "https://raw.githubusercontent.com/saragluna/ASA-Samples-Web-Application/quickstart/infra/upload-jar-to-asa.sh",
-    "ref_identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('const_identityName'))]",
-    "name_resourceGroup": "[format('{0}{1}', variables('abbrs').resourcesResourceGroups, parameters('environmentName'))]",
-    "name_deploymentScriptName": "asa-deployment-script",
-    "name_roleAssignmentName": "[guid(format('{0}{1}Role assignment in group{0}', variables('name_resourceGroup'), variables('ref_identityId')))]",
     "tags": {
       "azd-env-name": "[parameters('environmentName')]",
       "spring-cloud-azure": "true"
@@ -427,9 +412,6 @@
           "asaInstanceName": {
             "value": "[variables('asaInstanceName')]"
           },
-          "relativePath": {
-            "value": "[parameters('relativePath')]"
-          },
           "databaseUsername": {
             "value": "[variables('psqlUserName')]"
           },
@@ -438,6 +420,9 @@
           },
           "datasourceUrl": {
             "value": "[variables('datasourceJdbcUrl')]"
+          },
+          "guidValue": {
+            "value": "[parameters('guidValue')]"
           }
         },
         "template": {
@@ -465,9 +450,6 @@
               "type": "object",
               "defaultValue": {}
             },
-            "relativePath": {
-              "type": "string"
-            },
             "databaseUsername": {
               "type": "string"
             },
@@ -476,7 +458,20 @@
             },
             "datasourceUrl": {
               "type": "string"
+            },
+            "guidValue": {
+              "type": "string"
             }
+          },
+          "variables": {
+            "const_identityName": "[concat('uami', variables('const_suffix'))]",
+            "const_suffix": "[take(replace(parameters('guidValue'), '-', ''), 6)]",
+            "const_ownerRole": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+            "const_scriptLocation": "https://raw.githubusercontent.com/saragluna/ASA-Samples-Web-Application/quickstart/infra/upload-jar-to-asa.sh",
+            "ref_identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('const_identityName'))]",
+            "name_resourceGroup": "[resourceGroup().name]",
+            "name_deploymentScriptName": "asa-deployment-script",
+            "name_roleAssignmentName": "[guid(format('{0}{1}Role assignment in group{0}', variables('name_resourceGroup'), variables('ref_identityId')))]",        
           },
           "resources": [
             {
