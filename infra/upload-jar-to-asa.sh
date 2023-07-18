@@ -34,7 +34,7 @@ if [[ -z "$ASA_SERVICE_NAME" ]]; then
 fi
 
 upload_url=$(az rest -m post -u "https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.AppPlatform/Spring/$ASA_SERVICE_NAME/apps/simple-todo-web/getResourceUploadUrl?api-version=2023-05-01-preview" | jq -r '.uploadUrl')
-source_url="https://github-registry-files.githubusercontent.com/659212286/dbf9ab80-221e-11ee-80bc-d0871ee1e962?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20230714%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230714T081855Z&X-Amz-Expires=300&X-Amz-Signature=78af7659c5039f9fdf37157ca612f885e015378ad7f0cced161f7c452a7e3656&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=659212286&response-content-disposition=filename%3Dsimple-todo-web-0.0.1-20230714.081623-1.jar&response-content-type=application%2Foctet-stream"
+source_url="https://github.com/saragluna/ASA-Samples-Web-Application/releases/download/v0.0.1/simple-todo-web-0.0.1.jar"
 auth_header="no-auth"
 
 storage_account_name=$(echo $upload_url | awk -F'[/.]' '{print $3}')
