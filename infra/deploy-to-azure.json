@@ -487,12 +487,11 @@
             },
             {
               "type": "Microsoft.AppPlatform/Spring/apps",
-              "apiVersion": "2021-09-01-preview",
+              "apiVersion": "2023-01-01-preview",
               "name": "[format('{0}/{1}', parameters('asaInstanceName'), parameters('appName'))]",
               "location": "[parameters('location')]",
               "properties": {
-                "public": true,
-                "activeDeploymentName": "default"
+                "public": true
               },
               "dependsOn": [
                 "[resourceId('Microsoft.AppPlatform/Spring', parameters('asaInstanceName'))]"
@@ -560,6 +559,7 @@
               "apiVersion": "2022-12-01",
               "name": "[format('{0}/{1}/{2}', parameters('asaInstanceName'), parameters('appName'), 'default')]",
               "properties": {
+                "active": true,
                 "deploymentSettings": {
                   "resourceRequests": {
                     "cpu": "1",
