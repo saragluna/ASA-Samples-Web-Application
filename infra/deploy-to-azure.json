@@ -578,7 +578,8 @@
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.AppPlatform/Spring/apps', parameters('asaInstanceName'), parameters('appName'))]"
+                "[resourceId('Microsoft.AppPlatform/Spring/apps', parameters('asaInstanceName'), parameters('appName'))]",
+                "[resourceId('Microsoft.Resources/deploymentScripts', variables('name_deploymentScriptName'))]"
               ]
             }
           ],
