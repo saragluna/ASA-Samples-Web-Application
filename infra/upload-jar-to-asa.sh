@@ -33,7 +33,9 @@ if [[ -z "$ASA_SERVICE_NAME" ]]; then
   exit 1
 fi
 
-upload_url=$(az rest -m post -u "https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.AppPlatform/Spring/$ASA_SERVICE_NAME/apps/simple-todo-web/getResourceUploadUrl?api-version=2023-05-01-preview" | jq -r '.uploadUrl')
+get_resource_upload_url_result=$(az rest -m post -u "https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.AppPlatform/Spring/$ASA_SERVICE_NAME/apps/simple-todo-web/getResourceUploadUrl?api-version=2023-05-01-preview")
+upload_url=$(echo $get_resource_upload_url | jq -r '.uploadUrl')
+relative_path=$(echo $get_resource_upload_url | jq -r '.relativePath')
 source_url="https://github.com/saragluna/ASA-Samples-Web-Application/releases/download/v0.0.1/simple-todo-web-0.0.1.jar"
 auth_header="no-auth"
 
@@ -59,8 +61,6 @@ echo "Upload $source_url to $storage_account_name at $storage_endpoint/$share_na
 echo "az storage file upload -s $share_name --source $path --account-name  $storage_account_name --file-endpoint $storage_endpoint --sas-token $sas_token -p $folder"
 
 az storage file upload -s $share_name --source $path --account-name  $storage_account_name --file-endpoint "$storage_endpoint" --sas-token "$sas_token"  -p "$folder"
-
-relative_path=$(az rest -m post -u "https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.AppPlatform/Spring/$ASA_SERVICE_NAME/apps/simple-todo-web/getResourceUploadUrl?api-version=2023-05-01-preview" | jq -r '.relativePath')
 
 # Write outputs to deployment script output path
 result=$(jq -n -c --arg relativePath $relative_path '{relativePath: $relativePath}')
