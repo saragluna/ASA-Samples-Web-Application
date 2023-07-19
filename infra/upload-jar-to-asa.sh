@@ -47,16 +47,15 @@ path=$(echo $upload_url | awk -F'[/?]' '{print $(NF-1)}')
 sas_token=$(echo $upload_url | awk -F'?' '{print $2}')
 
 # Download binary
-mkdir resources
-echo "Downloading binary from $source_url"
+echo "Downloading binary from $source_url to $path"
 if [ "$auth_header" == "no-auth" ]; then
-    curl "$source_url" -o $path
+    curl -L "$source_url" -o $path
 else
     curl -H "Authorization: $auth_header" "$source_url" -o $path
 fi
 
 # Upload to remote
-echo "Upload $source_url to $storage_account_name at $storage_endpoint/$share_name/$folder/$path"
+echo "Upload '$source_url' to '$storage_account_name' at '$storage_endpoint/$share_name/$folder/$path'"
 
 echo "az storage file upload -s $share_name --source $path --account-name  $storage_account_name --file-endpoint $storage_endpoint --sas-token $sas_token -p $folder"
 
