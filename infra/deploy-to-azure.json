@@ -27,18 +27,14 @@
     "psqlAdminPassword": {
       "type": "securestring",
       "metadata": {
-        "description": "PSQL Server administrator password"
+        "description": "The password for the PostgreSQL Server administrator."
       }
     },
     "psqlUserPassword": {
       "type": "securestring",
       "metadata": {
-        "description": "Application user password"
+        "description": "The password for the PostgreSQL application user, which will be used in the application."
       }
-    },
-    "guidValue": {
-      "defaultValue": "[newGuid()]",
-      "type": "securestring"
     }
   },
   "variables": {
@@ -188,9 +184,11 @@
     "datasourceJdbcUrl": "[format('jdbc:postgresql://{0}.postgres.database.azure.com:5432/{1}', variables('psqlServerName'), variables('databaseName'))]",
     "psqlAdminName": "psqladmin",
     "psqlUserName": "psqluser",
+    "userAssignedManagedIdentityName": "[format('{0}{1}', variables('abbrs').managedIdentityUserAssignedIdentities, variables('resourceToken'))]",
     "tags": {
-      "azd-env-name": "[parameters('environmentName')]",
-      "spring-cloud-azure": "true"
+      "spring-cloud-azure": "true",
+      "deploy-to-azure-button": "true",
+      "env-name": "[parameters('environmentName')]"
     }
   },
   "resources": [
@@ -407,7 +405,7 @@
             "value": "[variables('appName')]"
           },
           "tags": {
-            "value": "[union(variables('tags'), createObject('azd-service-name', variables('appName')))]"
+            "value": "[union(variables('tags'), createObject('asa-service-name', variables('appName')))]"
           },
           "asaInstanceName": {
             "value": "[variables('asaInstanceName')]"
@@ -421,8 +419,8 @@
           "datasourceUrl": {
             "value": "[variables('datasourceJdbcUrl')]"
           },
-          "guidValue": {
-            "value": "[parameters('guidValue')]"
+          "userAssignedManagedIdentityName": {
+            "value": "[variables('userAssignedManagedIdentityName')]"
           }
         },
         "template": {
@@ -459,19 +457,17 @@
             "datasourceUrl": {
               "type": "string"
             },
-            "guidValue": {
+            "userAssignedManagedIdentityName": {
               "type": "string"
             }
           },
           "variables": {
-            "const_identityName": "[concat('uami', variables('const_suffix'))]",
-            "const_suffix": "[take(replace(parameters('guidValue'), '-', ''), 6)]",
             "const_ownerRole": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
             "const_scriptLocation": "https://raw.githubusercontent.com/saragluna/ASA-Samples-Web-Application/quickstart/infra/",
-            "ref_identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('const_identityName'))]",
-            "name_resourceGroup": "[resourceGroup().name]",
+            "const_uploadScriptName": "upload-jar-to-asa.sh",
+            "ref_identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedManagedIdentityName'))]",
             "name_deploymentScriptName": "asa-deployment-script",
-            "name_roleAssignmentName": "[guid(format('{0}{1}Role assignment in group{0}', variables('name_resourceGroup'), variables('ref_identityId')))]"     
+            "name_roleAssignmentName": "[guid(format('{0}{1}Role assignment in group{0}', resourceGroup().name, variables('ref_identityId')))]"     
           },
           "resources": [
             {
@@ -499,7 +495,7 @@
             },
             {
               "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-              "name": "[variables('const_identityName')]",
+              "name": "[parameters('userAssignedManagedIdentityName')]",
               "apiVersion": "2023-01-31",
               "location": "[parameters('location')]"
             },
@@ -508,7 +504,7 @@
               "apiVersion": "2022-04-01",
               "name": "[variables('name_roleAssignmentName')]",
               "dependsOn": [
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('const_identityName'))]",
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedManagedIdentityName'))]",
                 "[resourceId('Microsoft.AppPlatform/Spring', parameters('asaInstanceName'))]"
               ],
               "properties": {
@@ -530,12 +526,12 @@
               "identity": {
                 "type": "UserAssigned",
                 "userAssignedIdentities": {
-                  "[format('{0}', resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('const_identityName')))]": {}
+                  "[format('{0}', resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedManagedIdentityName')))]": {}
                 }
               },
               "properties": {
                 "AzCliVersion": "2.41.0",
-                "primaryScriptUri": "[uri(variables('const_scriptLocation'), 'upload-jar-to-asa.sh')]",
+                "primaryScriptUri": "[uri(variables('const_scriptLocation'), variables('const_uploadScriptName'))]",
                 "environmentVariables": [
                   {
                     "name": "SUBSCRIPTION_ID",

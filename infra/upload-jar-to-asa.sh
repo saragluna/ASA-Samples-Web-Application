@@ -64,3 +64,6 @@ az storage file upload -s $share_name --source $path --account-name  $storage_ac
 # Write outputs to deployment script output path
 result=$(jq -n -c --arg relativePath $relative_path '{relativePath: $relativePath}')
 echo $result > $AZ_SCRIPTS_OUTPUT_PATH
+
+# Delete uami generated before exiting the script
+az identity delete --ids ${AZ_SCRIPTS_USER_ASSIGNED_IDENTITY}
