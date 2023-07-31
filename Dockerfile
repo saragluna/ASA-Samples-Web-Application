@@ -1,4 +1,5 @@
 FROM mcr.microsoft.com/openjdk/jdk:17-mariner as builder
+RUN ./mvnw clean package
 ARG JAR_FILE=web/target/*.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
