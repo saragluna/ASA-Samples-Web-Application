@@ -5,7 +5,6 @@ RUN java -Djarmode=layertools -jar application.jar extract
 
 FROM mcr.microsoft.com/openjdk/jdk:17-mariner
 VOLUME /tmp
-ARG EXTRACTED=./target/extracted
 COPY --from=builder dependencies/ ./
 COPY --from=builder spring-boot-loader/ ./
 COPY --from=builder snapshot-dependencies/ ./
